@@ -1,0 +1,124 @@
+---
+title       : COST OF EURO AREA MEMBERSHIP
+subtitle    : Turkey after the Global Financial Crisis
+author      : Gian Balsamo, Ph.D.
+job         : Day Light Organization
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : [mathjax,interactive,shiny]            # {mathjax, quiz, bootstrap}
+ext_widgets: {rCharts: [libraries/morris, libraries/nvd3]}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+
+--- .Executive Summary
+
+```{r, setup, message = F, echo = F}
+require(rCharts)
+knitr::opts_chunk$set(comment = NA, results = 'asis', tidy = F, message = T) # tidy = F, 
+```
+
+
+# Executive Summary
+In spite of being “one of the hardest hit emerging economies by the global financial crisis,” Turkey was able to soften considerably the effects of the recession by means of an expansionary monetary policy [see IMFworkingPaper2011, pp. 4-5]. This policy was aggressively deployed, starting November 2008, by the Central Bank of the Republic of Turkey (CBRT).  
+Given Turkey’s persistent aim at being granted Euro Area membership, becoming thereby one of the the nineteen countries that use the euro as their currency, this study probes the disadvantageous impact that Euro Area membership would have had on Turkey’s recent monetary policy. The web application linked to this presentation quantifies such impact. 
+A countercyclical and discretionary monetary policy is usually captured by changes in the short-term interest rate and the exchange rate. This is especially true in the case of a country such as Turkey that, starting from the 2001 crisis (noticeably, seven years before the beginning of the 2008 recession), purposefully adopted floating exchange rates and a robust inflation-targeting regime [IMFworkingPaper2011, p. 8].  
+As argued by Harun Alp and Selim Elekdag, lower interest rates increase domestic demand and output, “putting [thereby upward] pressure on inflation”; they increase net exports, “further decreasing aggregate demand”; and, through a “financial accelerator mechanism,” they strengthen balance sheet fundamentals, thereby decreasing the opportunity cost of investments [IMFworkingPaper2011, p. 14].  
+
+--- .Executive Summary 2nd page  
+
+According to Alp and Elekdag, these three factors explain why the CBRT’s monetary policy softened to a significant degree the medium-term impact of the global financial crisis.  This study adopts increments in money supply as a proxy to the CBRT’s pro-active interventions on interest rates and purposeful non-intervention on exchange rates. More specifically, increments/decrements of money supply are here treated as reasonably faithful indicators of a countercyclical leverage which is unavailable, by definition, to the central banks of Euro Area members.  
+In the aftermath of the 2008 crisis, Euro Area membership would have deprived the CBRT of the option of an expansionary monetary policy. Let us quantify this loss of leverage.
+In the following slides, **a cost function** is defined and measured in terms of **the ratio of the CBRT’s yearly increase in money supply over the analogous aggregate increase of its European counterparts**. The data consist of OECD monthly monetary aggregates from 1992 to 2014, and include currency narrowly defined, i.e. banknotes and coins, plus overnight deposits; they are measured as a seasonally adjusted index based on 2010=100 [see OECD2015].  
+The next few slides describe the rationale and the algorithm of the cost function, and provide a concise user guide to the cost-function application. Once activated, this application will enable the user to compute year-by-year the cost, or leverage loss, of an hypotethical Euro Area membership to Turkey's monetary policy. This slide presentation isn't but a vehicle for the distribution of the application itself. The cost function is deployed at this site:
+(https://gianbalsamo.shinyapps.io/moreComplexShinyApplication)
+
+---   
+
+# A "Literate Statistics" R Chunk
+The present slide provides a bona fide R code chunk in the spirit of "literate statistics." The chart in the following slide, obtained from this code, plots the increase in money supply for Turkey and the Euro Area from 1992 to 2014, with the 2010 value serving as 100 index. 
+
+---  
+
+```{r, inizio, echo = F, results = 'asis'}
+require(rCharts)
+require(shiny)
+require(shinyapps)
+require(slidify)
+require(slidifyLibraries)
+require(reshape2)
+require(knitr)
+
+for (package in c('rCharts', 'shiny','shinyapps','slidify','slidifyLibraries','reshape2','knitr')) {
+    if (!require(package, character.only=T, quietly=T)) {
+        install.packages(package)
+        library(package, character.only=T)
+    }
+}
+moneySupply<-read.csv('Turkey_vs_EuroArea.csv',header = TRUE)
+moneySupply<-as.data.frame(moneySupply[,c("LOCATION","TIME","Value")])
+moneySupply[,"TIME"]<-paste(moneySupply[,"TIME"],"01",sep="-")
+#moneySupply[,"TIME"]<-as.Date(moneySupply[,"TIME"])
+M1Turkey<-moneySupply[moneySupply[,"LOCATION"]=="TUR",c("TIME","LOCATION","Value")]
+M1EuroArea<-moneySupply[moneySupply[,"LOCATION"]=="EA19",c("TIME","LOCATION","Value")]
+compactM1<-cbind(M1Turkey,M1EuroArea[c("LOCATION","Value")])
+colnames(compactM1)[3]<-"ValueTurkey"
+colnames(compactM1)[5]<-"ValueEuroArea"
+compact<-compactM1[,c(1,3,5)]
+
+n1<-nPlot(Value~TIME, type='multiBarChart', data=M1Turkey)
+n1$print('chartA')
+```
+
+--- 
+
+## another chart
+
+```{r echo = F, results = 'asis'}   
+n2<-nPlot(Value~TIME, type='multiBarChart', data=M1EuroArea)
+n2$print('chartB')
+
+#uspexp <- melt(USPersonalExpenditure)
+#names(uspexp)[1:2] = c("category", "year")
+#x1 <- xPlot(Value ~ TIME, group = "LOCATION", data = moneySupply, type = "line-dotted")
+#print(x1)
+#$print("carta")
+
+
+#carta <- mPlot(x = "TIME", y = c("ValueTurkey","ValueEuroArea"), type = "Line", data =compactM1)
+#carta$print('chart1')
+      #save('test.html')
+```
+
+
+--- .Interactive Chart  
+
+# INTERACTIVE CHART
+# Money Supply (1992-2014, monthly data): Turkey versus Euro Area  
+By hovering the cursor over the chart, you can see and compare distinctive monthly values.  
+
+
+
+<iframe src = '/Users/gianfrancobalsamo/Dropbox/BIG_DATA/DevelopingDataProducts/slidify/fridayMorning/mySlidePresentation/test.html'></iframe>
+
+--- .Rationale and Algorithm  
+
+The decreasing/increasing gap between the two curves of the previous slide is a rough but suggestive indicator of the steady extent whereby Turkey’s monetary policy has been more expansionary than the Euro Area’s for the last fifteen years. Because of the difference in the two curves gradient, their gap bespeaks a more expansionary policy, hence a more aggressive increase in money supply on Turkey’s part, both **before** and **after** the 2010 index year – starting, that is, around 2001, which confirms Alp’s and Elekdag’s remark that in 2001 the CBRT’s monetary policy departed radically from that of previous years.  
+As to the cost computed by the cost function, it is expressed by the following formula:  
+$$COST = [(MT_{t} – MT_{2010})/MT_{2010}]/[(ME_{t} – ME_{2010})/ME_{2010}]$$
+where:  
+MT = Turkish money supply.  
+ME = Euro Area money supply.  
+COST = ratio of Turkish increase rate in money supply over Euro Area’s increase rate in money supply.  
+**This “cost” is a leverage multiplier: a typical cost over our time series, equal, say, to 4 or 5, indicates that on a certain time interval Turkey’s money supply was increasing four or five times faster that of the Euro Area – indicating thereby, by implication, the extent to which Turkey would have been penalized in its expansionary monetary policies by a hypothetical Euro Area membership.**  
+
+--- .Closing Materials  
+
+# Caveat  
+The cost function misfires for 2010-05-01 and 2010-06-01 because of the following incongruence in the OECD time series: they equate the 2010 money supply with the index 100, but being monthly data, they do not reach the value of 100 at the same time: the Turkish money supply touches 100 between June 2010 (98.63) and July 2010 (100.53), while the Euro Area money supply touches 100 one month earlier, between May 2010 (99.97) and June 2010 (100.79).  
+
+# References
+IMFworkingPaper2011: Alp, Harun and Elekdag, Selim. "The Role of Monetary Policy in Turkey during the Global Financial Crisis." IMF Working Papers, 2011. URL: (https://www.imf.org/external/pubs/ft/wp/2011/wp11150.pdf)  
+OECD2015: "Narrow Money (M1) Indicator." OECD. doi: 10.1787/7a23d68b-en. URL: (https://data.oecd.org/money/narrow-money-m1.htm)  
+
+
